@@ -120,7 +120,8 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Authentication', style: GoogleFonts.getFont('Inter')),
+        title: Text('Authentication',
+            style: GoogleFonts.getFont('Inter', color: Colors.black)),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
@@ -158,7 +159,8 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                       fontSize: 18, color: Color(0xff6C5DD3))),
             ),
             if (!authenticated)
-              Text('Oh ! You Need to authenticate to move forward',
+              Text(
+                  'Oh ! You Need to authenticate to move forward. \nI am doing this for you Safety!',
                   style: GoogleFonts.getFont('Inter',
                       fontSize: 15, color: Colors.red)),
             TextButton(

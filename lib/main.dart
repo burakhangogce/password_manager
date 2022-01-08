@@ -1,118 +1,129 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:password_manager/PasswordHome.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-void main() async {
-  await Hive.box('password');
-  runApp(const MyApp());
-}
+import 'Authentication.dart';
+
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+    SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+
+    return MultiBlocProvider(
+      providers: [BlocProvider<CinemaBloc>(create: (context) => CinemaBloc())],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Frave - Projects',
+        initialRoute: '/',
+        routes: routes,
+        theme: ThemeData(
+            scaffoldBackgroundColor: Colors.white,
+            primaryColorBrightness: Brightness.light,
+            visualDensity: VisualDensity.adaptivePlatformDensity),
       ),
-      home: PasswordHomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+Map<String, Widget Function(BuildContext)> routes = {
+  '/': (_) => AuthenticationPage(),
+  'authentication': (_) => AuthenticationPage(),
+};
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+class CinemaBloc extends Bloc<CinemaEvent, CinemaState> {
+  CinemaBloc() : super(CinemaState()) {
+    on<OnSelectedDateEvent>(_onSelectedDate);
+    on<OnSelectedTimeEvent>(_onSelectedTime);
+    on<OnSelectedSeatsEvent>(_onSelectedSeats);
+    on<OnSelectMovieEvent>(_onSelectedMovie);
+  }
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+  List<String> seats = [];
 
-  final String title;
+  Future<void> _onSelectedDate(
+      OnSelectedDateEvent event, Emitter<CinemaState> emit) async {
+    emit(state.copyWith(date: event.date));
+  }
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  Future<void> _onSelectedTime(
+      OnSelectedTimeEvent event, Emitter<CinemaState> emit) async {
+    emit(state.copyWith(time: event.time));
+  }
+
+  Future<void> _onSelectedSeats(
+      OnSelectedSeatsEvent event, Emitter<CinemaState> emit) async {
+    if (seats.contains(event.selectedSeats)) {
+      seats.remove(event.selectedSeats);
+      emit(state.copyWith(selectedSeats: seats));
+    } else {
+      seats.add(event.selectedSeats);
+      emit(state.copyWith(selectedSeats: seats));
+    }
+  }
+
+  Future<void> _onSelectedMovie(
+      OnSelectMovieEvent event, Emitter<CinemaState> emit) async {
+    emit(state.copyWith(nameMovie: event.name, imageMovie: event.image));
+  }
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+@immutable
+abstract class CinemaEvent {}
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+class OnSelectMovieEvent extends CinemaEvent {
+  final String name;
+  final String image;
 
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
+  OnSelectMovieEvent(this.name, this.image);
+}
+
+class OnSelectedDateEvent extends CinemaEvent {
+  final String date;
+
+  OnSelectedDateEvent(this.date);
+}
+
+class OnSelectedTimeEvent extends CinemaEvent {
+  final String time;
+
+  OnSelectedTimeEvent(this.time);
+}
+
+class OnSelectedSeatsEvent extends CinemaEvent {
+  final String selectedSeats;
+
+  OnSelectedSeatsEvent(this.selectedSeats);
+}
+
+@immutable
+class CinemaState {
+  final String nameMovie;
+  final String imageMovie;
+  final String date;
+  final String time;
+  final List<String> selectedSeats;
+
+  CinemaState(
+      {this.nameMovie = '',
+      this.imageMovie = '',
+      this.date = '0',
+      this.time = '00',
+      List<String>? selectedSeats})
+      : this.selectedSeats = selectedSeats ?? [];
+
+  CinemaState copyWith(
+          {String? date,
+          String? time,
+          List<String>? selectedSeats,
+          String? nameMovie,
+          String? imageMovie}) =>
+      CinemaState(
+          nameMovie: nameMovie ?? this.nameMovie,
+          imageMovie: imageMovie ?? this.imageMovie,
+          date: date ?? this.date,
+          time: time ?? this.time,
+          selectedSeats: selectedSeats ?? this.selectedSeats);
 }
