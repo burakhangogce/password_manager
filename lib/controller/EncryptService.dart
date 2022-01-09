@@ -2,6 +2,7 @@ import 'package:encrypt/encrypt.dart' as ENCRYPT;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 class EncryptService {
   final iv = ENCRYPT.IV.fromLength(16);
@@ -28,7 +29,7 @@ class EncryptService {
     Clipboard.setData(ClipboardData(text: decrypted));
 
     Fluttertoast.showToast(
-        msg: 'Copied to your Clipboard',
+        msg: 'Copied to your Clipboard'.tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 2,

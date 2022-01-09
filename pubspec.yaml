@@ -44,6 +44,7 @@ dependencies:
   hive_flutter: ^1.0.0
   local_auth: ^1.1.6
   url_launcher: ^6.0.12
+  get: ^4.6.1
 
 dev_dependencies:
   flutter_test:

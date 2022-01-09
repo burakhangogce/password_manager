@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
+import 'package:password_manager/language/localeString.dart';
 
 import 'Authentication.dart';
 
@@ -12,18 +14,17 @@ class MyApp extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: Colors.transparent));
 
-    return MultiBlocProvider(
-      providers: [BlocProvider<CinemaBloc>(create: (context) => CinemaBloc())],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Frave - Projects',
-        initialRoute: '/',
-        routes: routes,
-        theme: ThemeData(
-            scaffoldBackgroundColor: Colors.white,
-            primaryColorBrightness: Brightness.light,
-            visualDensity: VisualDensity.adaptivePlatformDensity),
-      ),
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      translations: LocaleString(),
+      locale: Locale('en', 'US'),
+      title: 'Frave - Projects',
+      initialRoute: '/',
+      routes: routes,
+      theme: ThemeData(
+          scaffoldBackgroundColor: Colors.white,
+          primaryColorBrightness: Brightness.light,
+          visualDensity: VisualDensity.adaptivePlatformDensity),
     );
   }
 }

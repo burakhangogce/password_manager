@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:hive/hive.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -116,21 +118,77 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
     }
   }
 
+  final List locale = [
+    {'name': 'English', 'locale': Locale('en', 'US')},
+    {'name': 'Turkish', 'locale': Locale('tr', 'TR')},
+  ];
+  updateLanguage(Locale locale) {
+    Get.back();
+    Get.updateLocale(locale);
+  }
+
+  buildLanguageDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (builder) {
+          return AlertDialog(
+            title: Text('Choose Your Language'),
+            content: Container(
+              width: double.maxFinite,
+              child: ListView.separated(
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        child: Text(locale[index]['name']),
+                        onTap: () {
+                          print(locale[index]['name']);
+                          updateLanguage(locale[index]['locale']);
+                        },
+                      ),
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return Divider(
+                      color: Colors.blue,
+                    );
+                  },
+                  itemCount: locale.length),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Authentication',
+        title: Text('Authentication'.tr,
             style: GoogleFonts.getFont('Inter', color: Colors.black)),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
+        actions: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GestureDetector(
+              onTap: () {
+                buildLanguageDialog(context);
+              },
+              child: Icon(
+                Icons.language,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Fingerprint',
+            Text('Fingerprint'.tr,
                 style: GoogleFonts.getFont('Inter',
                     fontSize: 24, color: Color(0xff6C5DD3))),
             SizedBox(height: 20),
@@ -154,18 +212,17 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
             TextButton(
               onPressed: () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => AuthenticationPinPage())),
-              child: Text('Try again PIN',
+              child: Text('tryAgainPIN'.tr,
                   style: GoogleFonts.getFont('Inter',
                       fontSize: 18, color: Color(0xff6C5DD3))),
             ),
             if (!authenticated)
-              Text(
-                  'Oh ! You Need to authenticate to move forward. \nI am doing this for you Safety!',
+              Text('youNeed'.tr,
                   style: GoogleFonts.getFont('Inter',
                       fontSize: 15, color: Colors.red)),
             TextButton(
               onPressed: () => authenticate(),
-              child: Text('Try again Biometrics',
+              child: Text('tryAgainBIO'.tr,
                   style: GoogleFonts.getFont('Inter',
                       fontSize: 18, color: Color(0xff6C5DD3))),
             ),

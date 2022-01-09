@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -10,6 +11,48 @@ class PasswordHomePage extends StatefulWidget {
 }
 
 class _PasswordHomePageState extends State<PasswordHomePage> {
+  final List locale = [
+    {'name': 'English', 'locale': Locale('en', 'US')},
+    {'name': 'Turkish', 'locale': Locale('tr', 'TR')},
+  ];
+  updateLanguage(Locale locale) {
+    Get.back();
+    Get.updateLocale(locale);
+  }
+
+  buildLanguageDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (builder) {
+          return AlertDialog(
+            title: Text('Choose Your Language'),
+            content: Container(
+              width: double.maxFinite,
+              child: ListView.separated(
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        child: Text(locale[index]['name']),
+                        onTap: () {
+                          print(locale[index]['name']);
+                          updateLanguage(locale[index]['locale']);
+                        },
+                      ),
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return Divider(
+                      color: Colors.blue,
+                    );
+                  },
+                  itemCount: locale.length),
+            ),
+          );
+        });
+  }
+
   Box box = Hive.box('password');
   bool longPressed = false;
   EncryptService _encryptService = EncryptService();
@@ -18,11 +61,25 @@ class _PasswordHomePageState extends State<PasswordHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your Passwords',
+        title: Text('Your Passwords'.tr,
             style: GoogleFonts.getFont('Inter', color: Colors.white)),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Color(0xff6C5DD3),
+        actions: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GestureDetector(
+              onTap: () {
+                buildLanguageDialog(context);
+              },
+              child: Icon(
+                Icons.language,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Padding(
           padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
@@ -31,14 +88,13 @@ class _PasswordHomePageState extends State<PasswordHomePage> {
             builder: (context, Box box, _) {
               if (box.values.isEmpty)
                 return Center(
-                    child: Text('No Value!',
+                    child: Text('No Value!'.tr,
                         style: GoogleFonts.getFont('Inter',
                             color: Colors.black87)));
               return ListView.builder(
                 itemCount: box.values.length,
                 itemBuilder: (context, index) {
                   Map data = box.getAt(index);
-
                   return Padding(
                       padding: EdgeInsets.only(bottom: 15.0),
                       child: Container(
@@ -106,6 +162,11 @@ class _PasswordHomePageState extends State<PasswordHomePage> {
                 await box.deleteAt(index);
                 setState(() {});
                 Navigator.pop(context);
+              }),
+          TextButton(
+              child: Text('No'),
+              onPressed: () {
+                Navigator.pop(context);
               })
         ],
       ),
@@ -119,90 +180,90 @@ class _PasswordHomePageState extends State<PasswordHomePage> {
 
     showModalBottomSheet(
         context: context,
-        builder: (context) => Container(
-              padding: EdgeInsets.all(15.0),
-              child: Form(
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextFormField(
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Service',
-                            hintText: 'Google'),
-                        style: GoogleFonts.getFont('Inter', fontSize: 18),
-                        onChanged: (value) => type = value,
-                        validator: (val) {
-                          if (val!.trim().isEmpty)
-                            return 'Enter a value!';
-                          else
-                            return null;
-                        },
-                      ),
-                      SizedBox(height: 15.0),
-                      TextFormField(
-                        decoration: InputDecoration(
+        isScrollControlled: true,
+        builder: (context) => Padding(
+              padding: MediaQuery.of(context).viewInsets,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      decoration: InputDecoration(
                           border: OutlineInputBorder(),
-                          labelText: 'Username/Email/Phone',
-                        ),
-                        style: GoogleFonts.getFont('Inter', fontSize: 18),
-                        onChanged: (value) => email = value,
-                        validator: (val) {
-                          if (val!.trim().isEmpty)
-                            return 'Enter a value!';
-                          else
-                            return null;
-                        },
+                          labelText: 'Service'.tr,
+                          hintText: 'Google'),
+                      style: GoogleFonts.getFont('Inter', fontSize: 18),
+                      onChanged: (value) => type = value,
+                      validator: (val) {
+                        if (val!.trim().isEmpty)
+                          return 'Enter a value!';
+                        else
+                          return null;
+                      },
+                    ),
+                    SizedBox(height: 15.0),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'usernameInfo'.tr,
                       ),
-                      SizedBox(height: 15.0),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Password',
-                        ),
-                        style: GoogleFonts.getFont('Inter', fontSize: 18),
-                        onChanged: (value) => password = value,
-                        validator: (val) {
-                          if (val!.trim().isEmpty)
-                            return 'Enter a value!';
-                          else
-                            return null;
-                        },
+                      style: GoogleFonts.getFont('Inter', fontSize: 18),
+                      onChanged: (value) => email = value,
+                      validator: (val) {
+                        if (val!.trim().isEmpty)
+                          return 'Enter a value!';
+                        else
+                          return null;
+                      },
+                    ),
+                    SizedBox(height: 15.0),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Password'.tr,
                       ),
-                      SizedBox(height: 15.0),
-                      ElevatedButton(
-                        style: ButtonStyle(
-                            padding: MaterialStateProperty.all(
-                                EdgeInsets.symmetric(
-                                    horizontal: 50.0, vertical: 13.0)),
-                            backgroundColor:
-                                MaterialStateProperty.all(Color(0xff6C5DD3))),
-                        child: Text('Save',
-                            style: GoogleFonts.getFont('Inter', fontSize: 18)),
-                        onPressed: () {
-                          // Encrypt
-                          password = _encryptService.encrypt(password);
+                      style: GoogleFonts.getFont('Inter', fontSize: 18),
+                      onChanged: (value) => password = value,
+                      validator: (val) {
+                        if (val!.trim().isEmpty)
+                          return 'Enter a value!';
+                        else
+                          return null;
+                      },
+                    ),
+                    SizedBox(height: 15.0),
+                    ElevatedButton(
+                      style: ButtonStyle(
+                          padding: MaterialStateProperty.all(
+                              EdgeInsets.symmetric(
+                                  horizontal: 50.0, vertical: 13.0)),
+                          backgroundColor:
+                              MaterialStateProperty.all(Color(0xff6C5DD3))),
+                      child: Text('Save'.tr,
+                          style: GoogleFonts.getFont('Inter', fontSize: 18)),
+                      onPressed: () {
+                        // Encrypt
+                        password = _encryptService.encrypt(password);
 
-                          // Insert into DB
-                          Box box = Hive.box('password');
+                        // Insert into DB
+                        Box box = Hive.box('password');
 
-                          //insert
-                          var value = {
-                            'type': type,
-                            'email': email,
-                            'password': password
-                          };
+                        //insert
+                        var value = {
+                          'type': type,
+                          'email': email,
+                          'password': password
+                        };
 
-                          box.add(value);
+                        box.add(value);
 
-                          Navigator.pop(context);
+                        Navigator.pop(context);
 
-                          setState(() {});
-                        },
-                      )
-                    ],
-                  ),
+                        setState(() {});
+                      },
+                    )
+                  ],
                 ),
               ),
             ));
